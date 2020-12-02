@@ -17,6 +17,7 @@ pipeline {
         kubernetesNamespace = 'morse-server'
         dockerImage = ''
         dnsName = ''
+    }
 
 	stages {
 		stage('Build Docker image and push to registry') {
