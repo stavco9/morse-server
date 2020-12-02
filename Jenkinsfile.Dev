@@ -2,8 +2,8 @@
 pipeline {
     agent {
         kubernetes{
-            label 'jenkins-kube-slave'
-            defaultContainer 'jenkins-kube-slave'
+            label 'jenkins-docker-slave'
+            defaultContainer 'jenkins-docker-slave'
         }
     }    
 
