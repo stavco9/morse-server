@@ -17,17 +17,18 @@ pipeline {
 	stages {
 		stage('Build Docker image and push to registry') {
 			steps {
-                def imageName = "morse-server"
-                def imageTag = "dev-${BUILD_NUMBER}"
-
                 script{
+                    def imageName = "morse-server"
+                    def imageTag = "dev-${BUILD_NUMBER}"
+
                     if(env.BRANCH_NAME == "master" || env.BRANCH_NAME == "release" || env.BRANCH_NAME == "main"){
                         imageTag = "release-${BUILD_NUMBER}"
                     }
-                }
 
-                buildImage(imageName, imageTag)
-                pushImage(imageName, imageTag)
+                    
+                    buildImage(imageName, imageTag)
+                    pushImage(imageName, imageTag)
+                }
 			}
 		}
 
