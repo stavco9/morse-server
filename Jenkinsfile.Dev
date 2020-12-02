@@ -1,11 +1,6 @@
 #!/usr/bin/groovy
 pipeline {
-	agent{
-        kubernetes{
-            label 'jenkins-docker-slave'
-            defaultContainer 'jenkins-docker-slave'
-        }
-    }             
+	agent any       
 
     environment {
         registryAddress = 'stavco9'
