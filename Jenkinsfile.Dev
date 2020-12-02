@@ -57,7 +57,7 @@ def buildImage(imageName, imageTag){
 }
 
 def pushImage(imageName, imageTag){
-    docker.withRegistry( '', registryCredential ) { 
+    docker.withRegistry( '', registryCredential ) {
         dockerImage.push() 
     }
 }
