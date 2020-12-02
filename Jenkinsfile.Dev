@@ -1,0 +1,63 @@
+#!/usr/bin/groovy
+pipeline {
+	agent{
+        kubernetes{
+            label 'jenkins-docker-slave'
+            defaultContainer 'jenkins-docker-slave'
+        }
+    }             
+
+    environment {
+        registryAddress = 'stavco9'
+        deployName = 'morse-server'
+        dnsZone = 'stavco9.com'
+        registryCredential = '964f61be-7736-4d8f-af4a-8951fccf1fd9'
+        kubernetesUrl = 'https://462d1a51-7954-49d8-afc4-078068dc1760.k8s.ondigitalocean.com'
+        kubernetesCredential = '23ebcd6f-781e-40e0-943c-f31626dbc806'
+        kubernetesNamespace = 'morse-server'
+        dockerImage = ''
+        dnsName = ''
+
+	stages {
+		stage('Build Docker image and push to registry') {
+			steps {
+                script{
+                    def imageName = "morse-server"
+                    def imageTag = "dev-${BUILD_NUMBER}"
+				    
+                    if(env.BRANCH_NAME == "master" || env.BRANCH_NAME == "release"){
+                        imageTag = "release-${BUILD_NUMBER}"
+                    }
+                }
+
+                buildImage(imageName, imageTag)
+                pushImage(imageName, imageTag)
+			}
+		}
+
+		//stage('Test') {
+		//	steps {
+		//		echo 'Testing..'
+		//	}
+		//}
+
+		//stage('Deploy') {
+		//	steps {
+		//		echo 'Deploying....'
+		//	}
+		//}
+
+	}
+}
+
+def buildImage(imageName, imageTag){
+    dir ('server' ) {
+        dockerImage = docker.build("${registryAddress}/${imageName}:${imageTag}")
+    }
+}
+
+def pushImage(imageName, imageTag){
+    docker.withRegistry( '', registryCredential ) { 
+        dockerImage.push() 
+    }
+}
