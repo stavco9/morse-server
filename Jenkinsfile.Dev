@@ -18,7 +18,7 @@ pipeline {
 		stage('Build Docker image and push to registry') {
 			steps {
                 script{
-                    // Check pipelineeee
+                    // Check pipelineeeeeeeeeee
                     def imageName = "morse-server"
                     def imageTag = "dev-${BUILD_NUMBER}"
 
