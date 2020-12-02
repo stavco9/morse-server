@@ -26,13 +26,15 @@ pipeline {
                     // Check pipelineeeeeeeeeee
                     def imageName = "morse-server"
                     def imageTag = "dev-${BUILD_NUMBER}"
+                    def listenPort = 5000
 
                     if(env.BRANCH_NAME == "master" || env.BRANCH_NAME == "release" || env.BRANCH_NAME == "main"){
                         imageTag = "release-${BUILD_NUMBER}"
+                        listenPort = 4000
                     }
 
                     
-                    buildImage(imageName, imageTag)
+                    buildImage(imageName, imageTag, listenPort)
                     pushImage(imageName, imageTag)
                 }
 			}
@@ -53,9 +55,9 @@ pipeline {
 	}
 }
 
-def buildImage(imageName, imageTag){
+def buildImage(imageName, imageTag, listenPort){
     dir ('server' ) {
-        dockerImage = docker.build("${registryAddress}/${imageName}:${imageTag}")
+        dockerImage = docker.build("${registryAddress}/${imageName}:${imageTag}", "--build-arg LISTEN_PORT=${listenPort}")
     }
 }
 
