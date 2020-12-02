@@ -57,7 +57,7 @@ pipeline {
 
 def buildImage(imageName, imageTag, listenPort){
     dir ('server' ) {
-        dockerImage = docker.build("${registryAddress}/${imageName}:${imageTag}", "--build-arg LISTEN_PORT=${listenPort}")
+        dockerImage = docker.build("${registryAddress}/${imageName}:${imageTag}", "--build-arg LISTEN_PORT=${listenPort} .")
     }
 }
 
