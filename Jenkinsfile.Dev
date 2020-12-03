@@ -11,6 +11,9 @@ pipeline {
         registryAddress = 'stavco9'
         registryCredential = '964f61be-7736-4d8f-af4a-8951fccf1fd9'
         dockerImage = ''
+        imageName = 'morse-server'
+        imageTag = ''
+        listenPort = ''
     }
 
 	stages {
@@ -18,9 +21,8 @@ pipeline {
 			steps {
                 script{
                     // Check pipelineeeeeeeeeee
-                    def imageName = "morse-server"
-                    def imageTag = "dev-${BUILD_NUMBER}"
-                    def listenPort = 5000
+                    imageTag = "dev-${BUILD_NUMBER}"
+                    listenPort = 5000
 
                     if(env.BRANCH_NAME == "master" || env.BRANCH_NAME == "release" || env.BRANCH_NAME == "main"){
                         imageTag = "release-${BUILD_NUMBER}"
