@@ -1,0 +1,51 @@
+#!/usr/bin/groovy
+pipeline {
+    agent {
+        kubernetes{
+            label 'jenkins-docker-slave'
+            defaultContainer 'jenkins-docker-slave'
+        }
+    }    
+
+    environment {
+        registryAddress = 'stavco9'
+        deployName = 'morse-server'
+        dnsZone = 'stavco9.com'
+        registryCredential = '964f61be-7736-4d8f-af4a-8951fccf1fd9'
+        kubernetesUrl = 'https://462d1a51-7954-49d8-afc4-078068dc1760.k8s.ondigitalocean.com'
+        kubernetesCredential = '23ebcd6f-781e-40e0-943c-f31626dbc806'
+        kubernetesNamespace = 'morse-server'
+        dockerImage = ''
+        dnsName = ''
+    }
+
+	stages {
+		stage('Pull Docker Image and run it') {
+			steps {
+                script{
+                    // Check pipelineeeeeeeeeee
+                    def imageName = env.imageName
+                    def imageTag = env.imageTag
+                    def listenPort = env.listenPort
+
+                    pullImage(imageName, imageTag)
+                    runImage(listenPort)
+                }
+			}
+		}
+	}
+}
+
+def pullImage(imageName, imageTag){
+    dockerImage = docker.image("${registryAddress}/${imageName}:${imageTag}")
+
+    docker.withRegistry( '', registryCredential ) {
+        dockerImage.Pull()
+    }
+}
+
+def runImage(listenPort){
+    dockerImage.withRun("-p ${listenPort}:${listenPort}"){
+        sh 'test'
+    }
+}

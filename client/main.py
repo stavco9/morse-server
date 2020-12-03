@@ -21,7 +21,7 @@ def get_request(url, params):
 
 
 def main():
-    server_url = "http://localhost:9000" #os.getenv("SERVER_URL")
+    server_url = "http://localhost:4000" #os.getenv("SERVER_URL")
     server_uri = "morse-code"
 
     ip_addr = socket.gethostbyname(socket.gethostname())
