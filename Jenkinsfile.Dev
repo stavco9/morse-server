@@ -20,7 +20,7 @@ pipeline {
 		stage('Build Docker image and push to registry') {
 			steps {
                 script{
-                    // Check pipelineeeeeeeeeee
+                    // Check pipelineeeeeeeeeeeeee
                     imageTag = "dev-${BUILD_NUMBER}"
                     listenPort = 5000
 
