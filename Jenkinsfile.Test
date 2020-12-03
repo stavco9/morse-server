@@ -40,7 +40,7 @@ def pullImage(imageName, imageTag){
     dockerImage = docker.image("${registryAddress}/${imageName}:${imageTag}")
 
     docker.withRegistry( '', registryCredential ) {
-        dockerImage.Pull()
+        dockerImage.pull()
     }
 }
 
