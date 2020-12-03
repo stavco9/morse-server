@@ -8,8 +8,8 @@ pipeline {
     }
 
     parameters {
-        string(defaultValue: "", name: 'imageName'),
-        string(defaultValue: "", name: 'imageTag'),
+        string(defaultValue: "", name: 'imageName')
+        string(defaultValue: "", name: 'imageTag')
         string(defaultValue: "", name: 'listenPort')
     }
 
