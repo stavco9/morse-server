@@ -39,7 +39,7 @@ pipeline {
         stage ('Invoke Test Pipeline') {
             steps {
                 build job: 'Morse Server e2e testing', parameters: [
-                string(name: 'listenPort', value: listenPort),
+                string(name: 'listenPort', value: listenPort.toString()),
                 string(name: 'imageName', value: imageName),
                 string(name: 'imageTag', value: imageTag)
                 ]
