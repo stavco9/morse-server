@@ -62,7 +62,7 @@ pipeline {
                     // Get the host IP address which runs the server container (This slave is a Docker container)
                     serverAddress = sh (
                         script: "/sbin/ip route|awk '/default/ { print ${'$'}3 }' | xargs | head -n 1",
-                        returnStdout: true)
+                        returnStdout: true).trim()
 
                     counter = 1
 
