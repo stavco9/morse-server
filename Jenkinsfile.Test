@@ -74,12 +74,12 @@ pipeline {
                             counter++
                         }
                     }
-                }
 
-                if (!(serverReachable) || !(testPassed)){
-                    error('The server was not reachable in the last 30 seconds')
+                    if (!(serverReachable) || !(testPassed)){
+                        error('The server was not reachable in the last 30 seconds')
+                    }
+                    echo 'e2e Test has been passed !!!!!'
                 }
-                echo 'e2e Test has been passed !!!!!'
             }
         }
     }
