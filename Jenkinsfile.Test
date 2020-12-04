@@ -47,27 +47,36 @@ pipeline {
                 script{
                     serverReachable = false
                     serverAddress = sh 'hostname --ip-address'
+                    counter = 1
 
                     timeout(30){
                         while(true){
                             testPassed = testServer(clientImageName, "http://${serverAddress}:${listenPort}")
 
                             // When the test Passed at the first time, then we know the server is reachable
-                            if (testPassed){
+                            if (!(serverReachable) && testPassed){
                                 serverReachable = true
                             }
-
                             // If the test passed before and now it is not passing 
-                            if (serverReachable && !(testPassed)){
+                            else if (serverReachable && !(testPassed)){
                                 error('The test have been failed because it stopped to word after it worked before')
+                            }
+                            
+                            if (testPassed){
+                                echo "${counter} time: test has been passed"
+                            }
+                            else{
+                                echo "${counter} time: test has been failed"
                             }
 
                             sleep 5
+
+                            counter++
                         }
                     }
                 }
 
-                if (!serverReachable || !testPassed){
+                if (!(serverReachable) || !(testPassed)){
                     error('The server was not reachable in the last 30 seconds')
                 }
                 echo 'e2e Test has been passed !!!!!'
