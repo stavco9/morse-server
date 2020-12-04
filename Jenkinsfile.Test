@@ -112,13 +112,18 @@ def runServerImage(imagePath, listenPort){
 }
 
 def stopServerContainer(imagePath, listenPort){
-    sh """
-        for id in .*${'$'}(docker ps -q --filter ancestor="${imagePath}")
-        do
-            echo "Stopping container .*{'$id'}"
-            docker stop ".*{'$id'}"
-        done
-    """
+    serversContainers = sh (
+    script: "docker ps -q --filter ancestor=${imagePath}",
+    returnStdout: true)
+
+    if (serversContainers){
+        sh "docker stop .*${'$'}(echo ${serversContainers})"
+
+        echo "Stopped"
+    }
+    else{
+        echo "No containers exist"
+    }
 }
 
 def buildClientImage(imageName){
@@ -129,7 +134,7 @@ def buildClientImage(imageName){
 
 def testServer(clientImage, serverUrl){
     try{
-        status = sh "docker run -e \"SERVER_URL=${serverUrl}\" ${clientImage}"
+        sh "docker run -e \"SERVER_URL=${serverUrl}\" ${clientImage}"
 
         return true
     }
