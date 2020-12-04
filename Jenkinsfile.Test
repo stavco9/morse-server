@@ -31,6 +31,14 @@ pipeline {
     }
 
     stages {
+        stage('Stop all running server containers'){
+            steps{
+                echo 'Stopping the server containers'
+
+                stopServerContainerByPort(listenPort)
+            }
+        }
+
         stage('Pull Server Image and run it') {
             steps {
                 script{
