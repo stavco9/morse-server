@@ -1,11 +1,6 @@
 #!/usr/bin/groovy
 pipeline {
-    agent {
-        kubernetes{
-            label 'jenkins-docker-slave'
-            defaultContainer 'jenkins-docker-slave'
-        }
-    }
+    agent any
 
     //options {
     //    skipDefaultCheckout true
@@ -53,9 +48,10 @@ pipeline {
                 script{
                     serverReachable = false
 
-                    // Get the host IP address which runs the server container (This slave is a Docker container)
+                    // Get the host IP address
                     serverAddress = sh (
-                        script: "/sbin/ip route|awk '/default/ { print ${'$'}3 }' | xargs | head -n 1",
+                        script: "/sbin/ip route|awk '/docker0/ { print ${'$'}9 }'",
+                        //script: "/sbin/ip route|awk '/default/ { print ${'$'}3 }' | xargs | head -n 1",
                         returnStdout: true).trim()
 
                     counter = 1

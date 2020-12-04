@@ -1,11 +1,6 @@
 #!/usr/bin/groovy
 pipeline {
-    agent {
-        kubernetes{
-            label 'jenkins-docker-slave'
-            defaultContainer 'jenkins-docker-slave'
-        }
-    }    
+    agent any
 
     environment {
         registryAddress = 'stavco9'
@@ -17,6 +12,12 @@ pipeline {
     }
 
     stages {
+        stage ('Clean the workspace'){
+            steps{
+                sh "docker system prune -af --volumes"
+            }
+        }
+
         stage('Build Docker image and push to registry') {
             steps {
                 script{
@@ -37,14 +38,20 @@ pipeline {
             }
         }
 
-        //stage ('Invoke Test Pipeline') {
-        //   steps {
-        //        build job: 'Morse Server e2e testing', parameters: [
-        //        string(name: 'listenPort', value: listenPort.toString()),
-        //        string(name: 'imagePath', value: imagePath)
-        //        ]
-        //    }
-       // }
+        stage ('Invoke Test Pipeline') {
+           steps {
+                build job: 'Morse Server e2e testing', parameters: [
+                string(name: 'listenPort', value: listenPort.toString()),
+                string(name: 'imagePath', value: imagePath)
+                ]
+            }
+        }
+
+        stage ('Remove the current image from server'){
+            steps{
+                sh "docker image rm ${imagePath} --force"
+            }
+        }
 
         stage ('Invoke Deploy Pipeline') {
             steps {
