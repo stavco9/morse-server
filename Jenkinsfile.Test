@@ -94,7 +94,7 @@ pipeline {
         always {
             echo 'Stopping the server containers'
 
-            stopServerContainer(imagePath, listenPort)
+            stopServerContainerByPort(listenPort)
         }
     }
 }
@@ -111,13 +111,13 @@ def runServerImage(imagePath, listenPort){
     sh "docker run -d -p ${listenPort}:${listenPort} ${imagePath}"
 }
 
-def stopServerContainer(imagePath, listenPort){
+def stopServerContainerByPort(listenPort){
     serversContainers = sh (
-    script: "docker ps -q --filter ancestor=${imagePath}",
+    script: "docker ps -q --filter publish=${listenPort}",
     returnStdout: true)
 
     if (serversContainers){
-        sh "docker stop .*${'$'}(echo ${serversContainers})"
+        sh "docker stop ${'$'}(echo ${serversContainers})"
 
         echo "Stopped"
     }
