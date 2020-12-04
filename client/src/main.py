@@ -35,6 +35,8 @@ def check_morse_result(url, text):
         if text != morse.decode(morse_result):
             logging.error("Morse response does not match the excepted result")
             return False
+        else:
+            logging.info("The morse code of {} is {}".format(text, morse_result))
 
     logging.info("Morse response matches the excepted result !!!")
     return True
