@@ -61,12 +61,10 @@ pipeline {
 
                     // Get the host IP address which runs the server container (This slave is a Docker container)
                     serverAddress = sh (
-                        script: "/sbin/ip route|awk '/default/ { print ${'$'}3 }' | xargs | awk 'NF'",
+                        script: "/sbin/ip route|awk '/default/ { print ${'$'}3 }' | xargs | head -n 1",
                         returnStdout: true)
 
                     counter = 1
-
-                    echo "${serverAddress}"
 
                     retry(6){
                         testPassed = testServer(clientImageName, "http://${serverAddress}:${listenPort}")
