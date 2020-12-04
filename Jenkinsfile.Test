@@ -8,9 +8,9 @@ pipeline {
     }
 
     parameters {
-        string(defaultValue: "", name: 'imageName')
-        string(defaultValue: "", name: 'imageTag')
         string(defaultValue: "", name: 'listenPort')
+        string(defaultValue: "", name: 'imagePath')
+        string(defaultValue: "", name: 'environment')
     }
 
     environment {
@@ -26,32 +26,80 @@ pipeline {
     }
 
 	stages {
-		stage('Pull Docker Image and run it') {
+		stage('Pull Server Image and run it') {
 			steps {
                 script{
-                    // Check pipelineeeeeeeeeee
-                    //def imageName = imageName
-                    //def imageTag = imageTag
-                    //def listenPort = listenPort
-
-                    pullImage(imageName, imageTag)
-                    runImage(listenPort)
+                    pullServerImage(imagePath)
+                    runServerImage(imagePath, listenPort)
                 }
 			}
 		}
+
+        stage('Build Client Image'){
+            steps{
+                buildClientImage("morse-client")
+            }
+        }
+
+        stage('Test E2E Server functionality'){
+            steps{
+                script{
+                    def serverReachable = false
+                    def serverAddress = sh "hostname --ip-address"
+                }
+
+                timeout(30){
+                    while({
+                        def testPassed = testServer("morse-client", "http://${serverAddress}:${listenPort}")
+                        
+                        // When the test Passed at the first time, then we know the server is reachable
+                        if (testPassed){
+                            serverReachable = true
+                        }
+
+                        // If the test passed before and now it is not passing 
+                        if (serverReachable && !testPassed){
+                            error("The test have been failed because it stopped to word after it worked before")
+                        }
+
+                        sleep 5
+                    }()) continue
+                }
+
+                if (!serverReachable || !testPassed){
+                    error("The server was not reachable in the last 30 seconds")
+                }
+                
+                echo "e2e Test has been passed !!!!!"
+            }
+        }
 	}
 }
 
-def pullImage(imageName, imageTag){
-    dockerImage = docker.image("${registryAddress}/${imageName}:${imageTag}")
+def pullServerImage(imagePath){
+    dockerImage = docker.image("${imagePath}")
 
     docker.withRegistry( '', registryCredential ) {
         dockerImage.pull()
     }
 }
 
-def runImage(listenPort){
-    dockerImage.withRun("-p ${listenPort}:${listenPort}"){
-        sh 'test'
+def runServerImage(imagePath, listenPort){
+    sh "docker run -d -p ${listenPort}:${listenPort} ${imagePath}"
+}
+
+def buildClientImage(imageName){
+    dir ('client'){
+        dockerImage = docker.build("${imageName}")     
     }
+}
+
+def testServer(clientImage, serverUrl){
+    def status = sh "docker run -e \"SERVER_URL=${serverUrl}\" ${clientImage}"
+
+    if (status != 0){
+        return false
+    }
+
+    return true
 }

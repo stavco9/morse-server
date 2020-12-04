@@ -10,27 +10,28 @@ pipeline {
     environment {
         registryAddress = 'stavco9'
         registryCredential = '964f61be-7736-4d8f-af4a-8951fccf1fd9'
-        dockerImage = ''
         imageName = 'morse-server'
-        imageTag = ''
+        imagePath = ''
         listenPort = ''
+        environment = ''
     }
 
 	stages {
 		stage('Build Docker image and push to registry') {
 			steps {
                 script{
-                    // Check pipelineeeeeeeeeeeeee
-                    imageTag = "dev-${BUILD_NUMBER}"
+                    environment = "dev"
                     listenPort = 5000
 
                     if(env.BRANCH_NAME == "master" || env.BRANCH_NAME == "release" || env.BRANCH_NAME == "main"){
-                        imageTag = "release-${BUILD_NUMBER}"
+                        environment = "release"
                         listenPort = 4000
                     }
-
                     
-                    buildImage(imageName, imageTag, listenPort)
+                    def imageTag = "${environment}-${BUILD_NUMBER}"
+                    imagePath = "${registryAddress}/${imageName}:${imageTag}"
+
+                    buildImage(imagePath, listenPort)
                     pushImage()
                 }
 			}
@@ -40,17 +41,17 @@ pipeline {
             steps {
                 build job: 'Morse Server e2e testing', parameters: [
                 string(name: 'listenPort', value: listenPort.toString()),
-                string(name: 'imageName', value: imageName),
-                string(name: 'imageTag', value: imageTag)
+                string(name: 'imagePath', value: imagePath),
+                string(name: 'environment', value: environment)
                 ]
             }
         }
 	}
 }
 
-def buildImage(imageName, imageTag, listenPort){
+def buildImage(imagePath, listenPort){
     dir ('server' ) {
-        dockerImage = docker.build("${registryAddress}/${imageName}:${imageTag}", "--build-arg LISTEN_PORT=${listenPort} .")
+        dockerImage = docker.build("${imagePath}", "--build-arg LISTEN_PORT=${listenPort} .")
     }
 }
 
