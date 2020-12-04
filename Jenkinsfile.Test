@@ -20,38 +20,39 @@ pipeline {
         registryCredential = '964f61be-7736-4d8f-af4a-8951fccf1fd9'
         kubernetesUrl = 'https://462d1a51-7954-49d8-afc4-078068dc1760.k8s.ondigitalocean.com'
         kubernetesCredential = '23ebcd6f-781e-40e0-943c-f31626dbc806'
+        clientImageName = 'morse-client'
         kubernetesNamespace = 'morse-server'
         dockerImage = ''
         dnsName = ''
     }
 
-	stages {
-		stage('Pull Server Image and run it') {
-			steps {
+    stages {
+        stage('Pull Server Image and run it') {
+            steps {
                 script{
                     pullServerImage(imagePath)
                     runServerImage(imagePath, listenPort)
                 }
-			}
-		}
+            }
+        }
 
         stage('Build Client Image'){
             steps{
-                buildClientImage("morse-client")
+                buildClientImage(clientImageName)
             }
         }
 
         stage('Test E2E Server functionality'){
             steps{
                 script{
-                    def serverReachable = false
-                    def serverAddress = sh "hostname --ip-address"
+                    serverReachable = false
+                    serverAddress = sh 'hostname --ip-address'
                 }
 
                 timeout(30){
                     while({
-                        def testPassed = testServer("morse-client", "http://${serverAddress}:${listenPort}")
-                        
+                        testPassed = testServer(clientImageName, "http://${serverAddress}:${listenPort}")
+
                         // When the test Passed at the first time, then we know the server is reachable
                         if (testPassed){
                             serverReachable = true
@@ -59,7 +60,7 @@ pipeline {
 
                         // If the test passed before and now it is not passing 
                         if (serverReachable && !testPassed){
-                            error("The test have been failed because it stopped to word after it worked before")
+                            error('The test have been failed because it stopped to word after it worked before')
                         }
 
                         sleep 5
@@ -67,13 +68,12 @@ pipeline {
                 }
 
                 if (!serverReachable || !testPassed){
-                    error("The server was not reachable in the last 30 seconds")
+                    error('The server was not reachable in the last 30 seconds')
                 }
-                
-                echo "e2e Test has been passed !!!!!"
+                echo 'e2e Test has been passed !!!!!'
             }
         }
-	}
+    }
 }
 
 def pullServerImage(imagePath){
@@ -90,7 +90,7 @@ def runServerImage(imagePath, listenPort){
 
 def buildClientImage(imageName){
     dir ('client'){
-        dockerImage = docker.build("${imageName}")     
+        dockerImage = docker.build("${imageName}")
     }
 }
 
