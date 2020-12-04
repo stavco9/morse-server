@@ -7,6 +7,10 @@ pipeline {
         }
     }
 
+    options {
+        skipDefaultCheckout true
+    }
+
     parameters {
         string(defaultValue: "", name: 'listenPort')
         string(defaultValue: "", name: 'imagePath')
@@ -46,7 +50,10 @@ pipeline {
             steps{
                 script{
                     serverReachable = false
-                    serverAddress = sh 'hostname --ip-address'
+                    serverAddress = sh (
+                        script: 'hostname --ip-address',
+                        returnStdout: true)
+
                     counter = 1
 
                     timeout(30){
@@ -104,11 +111,12 @@ def buildClientImage(imageName){
 }
 
 def testServer(clientImage, serverUrl){
-    def status = sh "docker run -e \"SERVER_URL=${serverUrl}\" ${clientImage}"
+    try{
+        status = sh "docker run -e \"SERVER_URL=${serverUrl}\" ${clientImage}"
 
-    if (status != 0){
+        return true
+    }
+    catch(exc){
         return false
     }
-
-    return true
 }
