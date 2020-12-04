@@ -1,6 +1,6 @@
 #!/usr/bin/groovy
 pipeline {
-    agent any
+    agent {label 'slave'}
 
     environment {
         registryAddress = 'stavco9'
