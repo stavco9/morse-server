@@ -89,6 +89,13 @@ pipeline {
                 }
             }
         }
+    }    
+    post {
+        always {
+            echo 'Stopping the server containers'
+
+            stopServerContainer(imagePath, listenPort)
+        }
     }
 }
 
@@ -102,6 +109,16 @@ def pullServerImage(imagePath){
 
 def runServerImage(imagePath, listenPort){
     sh "docker run -d -p ${listenPort}:${listenPort} ${imagePath}"
+}
+
+def stopServerContainer(imagePath, listenPort){
+    sh """
+        for id in .*${'$'}(docker ps -q --filter ancestor="${imagePath}")
+        do
+            echo "Stopping container ${id}"
+            docker stop "${id}"
+        done
+    """
 }
 
 def buildClientImage(imageName){
