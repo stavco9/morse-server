@@ -7,9 +7,9 @@ pipeline {
         }
     }
 
-    options {
-        skipDefaultCheckout true
-    }
+    //options {
+    //    skipDefaultCheckout true
+    //}
 
     parameters {
         string(defaultValue: "", name: 'listenPort')
