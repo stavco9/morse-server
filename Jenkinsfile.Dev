@@ -17,7 +17,6 @@ pipeline {
                 script{
                     environment = 'dev'
                     listenPort = 5000
-                    sh 'whoami'
 
                     if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'release' || env.BRANCH_NAME == 'main'){
                         environment = 'release'
@@ -33,14 +32,14 @@ pipeline {
             }
         }
 
-        //stage ('Invoke Test Pipeline') {
-        //   steps {
-        //        build job: 'Morse Server e2e testing', parameters: [
-        //        string(name: 'listenPort', value: listenPort.toString()),
-        //        string(name: 'imagePath', value: imagePath)
-        //        ]
-        //    }
-       // }
+        stage ('Invoke Test Pipeline') {
+           steps {
+                build job: 'Morse Server e2e testing', parameters: [
+                string(name: 'listenPort', value: listenPort.toString()),
+                string(name: 'imagePath', value: imagePath)
+                ]
+            }
+        }
 
         stage ('Invoke Deploy Pipeline') {
             steps {
