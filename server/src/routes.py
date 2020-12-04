@@ -9,7 +9,14 @@ def homepage(path):
     return jsonify(
         error = "Cannot get /{}".format(path)
     ), 404
- 
+
+@api.route("/health")
+def health():
+    return jsonify(
+        status = True,
+        message = "Server is up"
+    ), 200
+
 @api.route("/morse-code")
 def translate():
     text = request.args.get('text')

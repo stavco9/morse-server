@@ -1,0 +1,68 @@
+#!/usr/bin/groovy
+pipeline {
+    agent {
+        kubernetes{
+            label 'jenkins-kube-slave'
+            defaultContainer 'jenkins-kube-slave'
+        }
+    }
+
+    //options {
+    //    skipDefaultCheckout true
+    //}
+
+    parameters {
+        string(defaultValue: "", name: 'listenPort')
+        string(defaultValue: "", name: 'imagePath')
+        string(defaultValue: "", name: 'environment')
+    }
+
+    environment {
+        deployName = 'morse-server'
+        kubernetesUrl = 'https://462d1a51-7954-49d8-afc4-078068dc1760.k8s.ondigitalocean.com'
+        kubernetesCredential = 'bbba3124-604e-4500-9243-690726401f15'
+        kubernetesNamespace = 'morse-code'
+        dnsName = ''
+    }
+
+    stages {
+        stage('Deploy server image to Kubernetes'){
+            steps{
+                editK8SYaml(listenPort, imagePath, environment)
+                deployToK8S(environment)
+            }
+        }
+    } 
+}
+
+def editK8SYaml(listenPort, imagePath, environment){
+    finalDeploymentName = "${deployName}-${environment}" 
+
+    dir ("k8s"){
+        // Replace image tag with the new tag and all the environment names
+        sh """#!/bin/bash 
+              sed -i 's|image: .*${'$'}|image: '"${imagePath}"'|g' Deployment.yaml
+              sed -i 's|name: ${deployName}.*${'$'}|name: '"${finalDeploymentName}"'|g' *.yaml
+              sed -i 's|namespace: .*${'$'}|namespace: '"${kubernetesNamespace}"'|g' *.yaml
+              sed -i 's|env: .*${'$'}|env: '"${environment}"'|g' *.yaml
+              sed -i 's|port: .*${'$'}|port: '"${listenPort}"'|g' *.yaml
+              sed -i 's|containerPort: .*${'$'}|containerPort: '"${listenPort}"'|g' Deployment.yaml
+        """
+    }
+}
+
+def deployToK8S(environment){
+    dir("k8s"){
+        withKubeConfig([
+            credentialsId: kubernetesCredential,
+            serverUrl: kubernetesUrl,
+            namespace: kubernetesNamespace
+        ]){
+            sh 'kubectl apply -f Deployment.yaml -f Service.yaml'
+
+            if (environment == 'release'){
+                sh 'kubectl apply -f Ingress.yaml'
+            }
+        }
+    }
+}

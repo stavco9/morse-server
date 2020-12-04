@@ -37,9 +37,18 @@ pipeline {
             }
         }
 
-        stage ('Invoke Test Pipeline') {
+        //stage ('Invoke Test Pipeline') {
+        //   steps {
+        //        build job: 'Morse Server e2e testing', parameters: [
+        //        string(name: 'listenPort', value: listenPort.toString()),
+        //        string(name: 'imagePath', value: imagePath)
+        //        ]
+        //    }
+       // }
+
+        stage ('Invoke Deploy Pipeline') {
             steps {
-                build job: 'Morse Server e2e testing', parameters: [
+                build job: 'Morse Server deploy', parameters: [
                 string(name: 'listenPort', value: listenPort.toString()),
                 string(name: 'imagePath', value: imagePath),
                 string(name: 'environment', value: environment)

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: morse-server-prod
+  namespace: morse-server
+  labels:
+    app: morse-server
+    env: prod
+spec:
+  ports:
+  - port: 5000
+    protocol: TCP
+  selector:
+    app: morse-server
+    env: prod
