@@ -115,8 +115,8 @@ def stopServerContainer(imagePath, listenPort){
     sh """
         for id in .*${'$'}(docker ps -q --filter ancestor="${imagePath}")
         do
-            echo "Stopping container ${id}"
-            docker stop "${id}"
+            echo "Stopping container .*{'$id'}"
+            docker stop ".*{'$id'}"
         done
     """
 }
