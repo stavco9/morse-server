@@ -1,0 +1,35 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: morse-server-prod
+  namespace: morse-server
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+          app: morse-server
+          env: prod
+  template:
+    metadata:
+      name: morse-server-prod
+      labels:
+        app: morse-server
+        env: prod
+    spec:
+      containers:
+      - name: morse-server-prod
+        image: stavco9/blabla
+        #resources:
+          #limits:
+          #  memory: "500Mi"
+        #    cpu: "100m"
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 3
+          periodSeconds: 3      
+        ports:
+        - name: app
+          containerPort: 5000
