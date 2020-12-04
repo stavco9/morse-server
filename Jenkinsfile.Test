@@ -50,7 +50,7 @@ pipeline {
 
                     // Get the host IP address
                     serverAddress = sh (
-                        script: 'hostname --ip-address'
+                        script: 'hostname --ip-address',
                         //script: "/sbin/ip route|awk '/default/ { print ${'$'}3 }' | xargs | head -n 1",
                         returnStdout: true).trim()
 
