@@ -12,6 +12,12 @@ pipeline {
     }
 
     stages {
+        stage ('Clean the workspace'){
+            steps{
+                sh "docker system prune -af --volumes"
+            }
+        }
+
         stage('Build Docker image and push to registry') {
             steps {
                 script{
@@ -38,6 +44,12 @@ pipeline {
                 string(name: 'listenPort', value: listenPort.toString()),
                 string(name: 'imagePath', value: imagePath)
                 ]
+            }
+        }
+
+        stage ('Remove the current image from server'){
+            steps{
+                sh "docker image rm ${imagePath}"
             }
         }
 
