@@ -17,7 +17,7 @@ pipeline {
                 script{
                     environment = 'dev'
                     listenPort = 5000
-                    echo 'whoami'
+                    sh 'whoami'
 
                     if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'release' || env.BRANCH_NAME == 'main'){
                         environment = 'release'
