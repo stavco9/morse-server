@@ -59,12 +59,12 @@ pipeline {
                 script{
                     serverReachable = false
                     serverAddress = sh (
-                        script: 'hostname --ip-address',
+                        script: "/sbin/ip route|awk '/default/ { print ${'$'}3 }'",
                         returnStdout: true)
 
                     counter = 1
 
-                    timeout(30){
+                    timeout(time: 30, unit: 'SECONDS'){
                         while(true){
                             testPassed = testServer(clientImageName, "http://${serverAddress}:${listenPort}")
 
