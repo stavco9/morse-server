@@ -41,11 +41,11 @@ def editK8SYaml(listenPort, imagePath, environment){
     dir ("k8s"){
         // Replace image tag with the new tag and all the environment names
         sh """#!/bin/bash 
-              sed -i 's|image: .*${'$'}|image: '"${imagePath}"'|g' deployment.yaml
+              sed -i 's|image: .*${'$'}|image: '"${imagePath}"'|g' Deployment.yaml
               sed -i 's|name: ${deployName}.*${'$'}|name: '"${finalDeploymentName}"'|g' *.yaml
               sed -i 's|env: .*${'$'}|env: '"${environment}"'|g' *.yaml
               sed -i 's|port: .*${'$'}|port: '"${listenPort}"'|g' *.yaml
-              sed -i 's|containerPort: .*${'$'}|containerPort: '"${listenPort}"'|g' deployment.yaml
+              sed -i 's|containerPort: .*${'$'}|containerPort: '"${listenPort}"'|g' Deployment.yaml
         """
     }
 }
@@ -57,10 +57,10 @@ def deployToK8S(environment){
             serverUrl: kubernetesUrl,
             namespace: kubernetesNamespace
         ]){
-            sh 'kubectl apply -f deployment.yaml -f service.yaml'
+            sh 'kubectl apply -f Deployment.yaml -f Service.yaml'
 
             if (environment == 'release'){
-                sh 'kubectl apply -f release.yaml'
+                sh 'kubectl apply -f Ingress.yaml'
             }
         }
     }
