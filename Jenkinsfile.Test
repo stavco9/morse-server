@@ -66,34 +66,37 @@ pipeline {
 
                     counter = 1
 
-                    retry(6){
-                        testPassed = testServer(clientImageName, "http://${serverAddress}:${listenPort}")
+                    timeout(time: 30, unit: 'SECONDS') {
+                        while(true){
+                            testPassed = testServer(clientImageName, "http://${serverAddress}:${listenPort}")
 
-                        // When the test Passed at the first time, then we know the server is reachable
-                        if (!(serverReachable) && testPassed){
-                            serverReachable = true
-                        }
-                        // If the test passed before and now it is not passing 
-                        else if (serverReachable && !(testPassed)){
-                            error('The test have been failed because it stopped to word after it worked before')
-                        }
-                        
-                        if (testPassed){
-                            echo "${counter} time: test has been passed"
-                        }
-                        else{
-                            echo "${counter} time: test has been failed"
-                        }
+                            // When the test Passed at the first time, then we know the server is reachable
+                            if (!(serverReachable) && testPassed){
+                                serverReachable = true
+                            }
+                            // If the test passed before and now it is not passing 
+                            else if (serverReachable && !(testPassed)){
+                                error('The test have been failed because it stopped to word after it worked before')
+                            }
+                            
+                            if (testPassed){
+                                echo "${counter} time: test has been passed"
+                            }
+                            else{
+                                echo "${counter} time: test has been failed"
+                            }
 
-                        sleep 5
+                            sleep 5
 
-                        counter++
+                            counter++
+                        }
                     }
-
-                    if (!(serverReachable) || !(testPassed)){
-                        error('The server was not reachable in the last 30 seconds')
+                    catchError(buildResult: 'SUCCESS', stageResult: 'ABORTED') { 
+                        if (!(serverReachable) || !(testPassed)){
+                            error('The server was not reachable in the last 30 seconds')
+                        }
+                        echo 'e2e Test has been passed !!!!!'
                     }
-                    echo 'e2e Test has been passed !!!!!'
                 }
             }
         }
