@@ -68,7 +68,7 @@ pipeline {
 
                     timeout(time: 30, unit: 'SECONDS') {
                         while(true){
-                            testPassed = testServer(clientImageName, "http://${serverAddress}:${listenPort}")
+                            testPassed = testServer(clientImageName, "http://10.244.1.30:${listenPort}")
 
                             // When the test Passed at the first time, then we know the server is reachable
                             if (!(serverReachable) && testPassed){
