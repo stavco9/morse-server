@@ -1,11 +1,6 @@
 #!/usr/bin/groovy
 pipeline {
-    agent {
-        kubernetes{
-            label 'jenkins-kube-slave'
-            defaultContainer 'jenkins-kube-slave'
-        }
-    }
+    agent any
 
     //options {
     //    skipDefaultCheckout true
