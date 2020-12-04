@@ -49,7 +49,7 @@ pipeline {
 
         stage ('Remove the current image from server'){
             steps{
-                sh "docker image rm ${imagePath}"
+                sh "docker image rm ${imagePath} --force"
             }
         }
 
