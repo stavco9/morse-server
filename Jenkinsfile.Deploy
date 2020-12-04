@@ -43,6 +43,7 @@ def editK8SYaml(listenPort, imagePath, environment){
         sh """#!/bin/bash 
               sed -i 's|image: .*${'$'}|image: '"${imagePath}"'|g' Deployment.yaml
               sed -i 's|name: ${deployName}.*${'$'}|name: '"${finalDeploymentName}"'|g' *.yaml
+              sed -i 's|namespace: .*${'$'}|namespace: '"${kubernetesNamespace}"'|g' *.yaml
               sed -i 's|env: .*${'$'}|env: '"${environment}"'|g' *.yaml
               sed -i 's|port: .*${'$'}|port: '"${listenPort}"'|g' *.yaml
               sed -i 's|containerPort: .*${'$'}|containerPort: '"${listenPort}"'|g' Deployment.yaml
