@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from routes import api
 
+# Run the server
 def main(listen_port):
     app = Flask(__name__)
 

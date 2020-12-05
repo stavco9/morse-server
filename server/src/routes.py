@@ -3,6 +3,7 @@ from controllers import translate_text_to_morse
 
 api = Blueprint('api', __name__)
 
+# Default route
 @api.route('/', defaults={'path': ''})
 @api.route('/<path:path>')
 def homepage(path):
@@ -10,6 +11,7 @@ def homepage(path):
         error = "Cannot get /{}".format(path)
     ), 404
 
+# Check server health
 @api.route("/health")
 def health():
     return jsonify(
@@ -17,6 +19,7 @@ def health():
         message = "Server is up"
     ), 200
 
+# Morse Code API
 @api.route("/morse-code")
 def translate():
     text = request.args.get('text')
