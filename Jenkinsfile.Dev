@@ -38,20 +38,20 @@ pipeline {
             }
         }
 
-        //stage ('Invoke Test Pipeline') {
-        //   steps {
-        //        build job: 'Morse Server e2e testing', parameters: [
-        //        string(name: 'listenPort', value: listenPort.toString()),
-        //        string(name: 'imagePath', value: imagePath)
-        //        ]
-        //    }
-        //}
+        stage ('Invoke Test Pipeline') {
+           steps {
+                build job: 'Morse Server e2e testing', parameters: [
+                string(name: 'listenPort', value: listenPort.toString()),
+                string(name: 'imagePath', value: imagePath)
+                ]
+            }
+        }
 
-        //stage ('Remove the current image from server'){
-        //    steps{
-        //        sh "docker image rm ${imagePath} --force"
-        //    }
-        //}
+        stage ('Remove the current image from server'){
+            steps{
+                sh "docker image rm ${imagePath} --force"
+            }
+        }
 
         stage ('Invoke Deploy Pipeline') {
             steps {
