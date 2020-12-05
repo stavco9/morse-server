@@ -21,6 +21,14 @@ pipeline {
     }
 
     stages {
+        stage('Check if this job has been triggered manually'){
+            steps{
+                if ( currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause') ){
+                    error('This job cannot be triggered manually')
+                }
+            }
+        }
+
         stage('Deploy server image to Kubernetes'){
             steps{
                 echo "${env.BUILD_CASE}"
