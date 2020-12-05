@@ -2,10 +2,6 @@
 pipeline {
     agent any
 
-    //options {
-    //    skipDefaultCheckout true
-    //}
-
     parameters {
         string(defaultValue: "", name: 'listenPort')
         string(defaultValue: "", name: 'imagePath')
@@ -20,6 +16,8 @@ pipeline {
     }
 
     stages {
+
+        // Make fake parameters if the job has been triggered manually
         stage('Check if this job has been triggered manually'){
             steps{
                 script{
@@ -33,9 +31,7 @@ pipeline {
 
         stage('Stop all running server containers'){
             steps{
-
                 echo 'Stopping the server containers'
-
                 stopServerContainerByPort(listenPort)
             }
         }
@@ -58,15 +54,16 @@ pipeline {
         stage('Test E2E Server functionality'){
             steps{
                 script{
-                    serverReachable = false
 
-                    // Get the host IP address
+                    // Get the host IP address in case of VM Slave
                     serverAddress = sh (
                         script: "/sbin/ip route|awk '/docker0/ { print ${'$'}9 }'",
-                        //script: "/sbin/ip route|awk '/default/ { print ${'$'}3 }' | xargs | head -n 1",
                         returnStdout: true).trim()
 
-                    counter = 1
+                    // Get the host IP address in case of Container Slave
+                    //serverAddress = sh (
+                    //    script: "/sbin/ip route|awk '/default/ { print ${'$'}3 }'",
+                    //    returnStdout: true).trim()
 
                     // Run the client code                        
                     testPassed = testServer(clientImageName, "http://${serverAddress}:${listenPort}")
@@ -98,6 +95,7 @@ def pullServerImage(imagePath){
     }
 }
 
+// Run in the background
 def runServerImage(imagePath, listenPort){
     sh "docker run -d -p ${listenPort}:${listenPort} ${imagePath}"
 }
@@ -123,6 +121,7 @@ def buildClientImage(imageName){
     }
 }
 
+// Run the container in foreground and return the resuly by status code
 def testServer(clientImage, serverUrl){
     try{
         sh "docker run -e \"SERVER_URL=${serverUrl}\" ${clientImage}"

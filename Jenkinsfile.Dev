@@ -12,6 +12,8 @@ pipeline {
     }
 
     stages {
+
+        // Remove all unuse Docker images
         stage ('Clean the workspace'){
             steps{
                 sh "docker system prune -af --volumes"

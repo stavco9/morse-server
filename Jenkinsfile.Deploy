@@ -2,10 +2,6 @@
 pipeline {
     agent any
 
-    //options {
-    //    skipDefaultCheckout true
-    //}
-
     parameters {
         string(defaultValue: "", name: 'listenPort')
         string(defaultValue: "", name: 'imagePath')
@@ -21,6 +17,8 @@ pipeline {
     }
 
     stages {
+
+        // Fail the job if triggered manually
         stage('Check if this job has been triggered manually'){
             steps{
                 script{
@@ -44,7 +42,7 @@ def editK8SYaml(listenPort, imagePath, environment){
     finalDeploymentName = "${deployName}-${environment}" 
 
     dir ("k8s"){
-        // Replace image tag with the new tag and all the environment names
+        // Replace image tag with the new tag and all the environment names and ports
         sh """#!/bin/bash 
               sed -i 's|image: .*${'$'}|image: '"${imagePath}"'|g' Deployment.yaml
               sed -i 's|name: ${deployName}.*${'$'}|name: '"${finalDeploymentName}"'|g' *.yaml
