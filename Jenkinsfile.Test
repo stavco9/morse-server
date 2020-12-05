@@ -22,7 +22,7 @@ pipeline {
     stages {
         stage('Stop all running server containers'){
             steps{
-                echo "${env.BUILD_CASE}"
+                echo "${currentBuild.rawBuild.getCauses()[0].toString()}"
 
                 echo 'Stopping the server containers'
 
