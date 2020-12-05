@@ -24,9 +24,7 @@ pipeline {
         stage('Check if this job has been triggered manually'){
             steps{
                 script{
-                    echo "${currentBuild.rawBuild.getCauses()[0].toString()}"
-
-                    if ( currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause') ){
+                    if ( currentBuild.rawBuild.getCauses()[0].toString().startsWith('hudson.model.Cause$UserIdCause') ){
                         error('This job cannot be triggered manually')
                     }
                 }
@@ -35,8 +33,6 @@ pipeline {
 
         stage('Deploy server image to Kubernetes'){
             steps{
-                echo "${env.BUILD_CASE}"
-
                 editK8SYaml(listenPort, imagePath, environment)
                 deployToK8S(environment)
             }
