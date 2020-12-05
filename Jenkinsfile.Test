@@ -20,8 +20,20 @@ pipeline {
     }
 
     stages {
+        stage('Check if this job has been triggered manually'){
+            steps{
+                script{
+                    if ( currentBuild.rawBuild.getCauses()[0].toString().startsWith('hudson.model.Cause$UserIdCause') ){
+                        listenPort = 1095
+                        imagePath = "stavco9/fake:manual"
+                    }
+                }
+            }
+        }
+
         stage('Stop all running server containers'){
             steps{
+
                 echo 'Stopping the server containers'
 
                 stopServerContainerByPort(listenPort)
