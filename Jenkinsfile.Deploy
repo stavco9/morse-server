@@ -24,6 +24,8 @@ pipeline {
         stage('Check if this job has been triggered manually'){
             steps{
                 script{
+                    echo "${currentBuild.rawBuild.getCauses()[0].toString()}"
+
                     if ( currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause') ){
                         error('This job cannot be triggered manually')
                     }
