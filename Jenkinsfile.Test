@@ -7,8 +7,8 @@ pipeline {
     //}
 
     parameters {
-        string(defaultValue: "", name: 'listenPort')
-        string(defaultValue: "", name: 'imagePath')
+        string(defaultValue: "1095", name: 'listenPort')
+        string(defaultValue: "stavco9/fake:manual", name: 'imagePath')
     }
 
     environment {
@@ -22,6 +22,8 @@ pipeline {
     stages {
         stage('Stop all running server containers'){
             steps{
+                echo "${env.BUILD_CASE}"
+
                 echo 'Stopping the server containers'
 
                 stopServerContainerByPort(listenPort)

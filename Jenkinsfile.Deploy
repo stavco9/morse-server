@@ -23,6 +23,8 @@ pipeline {
     stages {
         stage('Deploy server image to Kubernetes'){
             steps{
+                echo "${env.BUILD_CASE}"
+
                 editK8SYaml(listenPort, imagePath, environment)
                 deployToK8S(environment)
             }
